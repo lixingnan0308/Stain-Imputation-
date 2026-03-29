@@ -1,14 +1,18 @@
 # SIMIF: Stain Imputation in Multiplex Immunofluorescence Imaging
 
-This repository contains the official implementation of the paper:
+This directory contains the official implementation of:
 
 > **Stain Imputation in Multiplex Immunofluorescence Imaging**
-> Accepted at IEEE International Symposium on Biomedical Imaging (ISBI) 2025
+> Xingnan Li, Priyanka Rana, Tuba N Gide, Nurudeen A Adegoke, Yizhe Mao, Shlomo Berkovsky, Enrico Coiera, James S Wilmott, Sidong Liu
+> *IEEE International Symposium on Biomedical Imaging (ISBI) 2025*
 > [[IEEE Xplore]](https://ieeexplore.ieee.org/document/10981016/)
+
+> **Looking for multi-output imputation?**
+> See [AdSI-MIMO](../AdSI-MIMO/README.md) — our extended method that imputes all stains simultaneously from any input subset, with up to **+48.1 % Pearson correlation** improvement over SIMIF.
 
 ## Overview
 
-SIMIF imputes missing stain channels in multiplexed immunofluorescence (MxIF) images using a Wasserstein GAN with Gradient Penalty (WGAN-GP). Given a subset of available stain channels (e.g., DAPI, CD4, CD8) as input, the model generates the missing target channel (e.g., PD-L1) at the image-patch level.
+SIMIF imputes a single missing stain channel in multiplexed immunofluorescence (MxIF) images using a Wasserstein GAN with Gradient Penalty (WGAN-GP). Given a subset of available stain channels (e.g., DAPI, CD4, CD8) as input, the model generates the missing target channel (e.g., PD-L1) at the image-patch level. One model is trained per target stain.
 
 Key design choices:
 - **Generator**: U-Net with skip connections (`init_features=128`)
@@ -131,8 +135,11 @@ The code automatically selects the compute device:
 If you use this code, please cite:
 
 ```bibtex
-@inproceedings{simif2025,
+@inproceedings{li2025simif,
   title     = {Stain Imputation in Multiplex Immunofluorescence Imaging},
+  author    = {Li, Xingnan and Rana, Priyanka and Gide, Tuba N and Adegoke, Nurudeen A
+               and Mao, Yizhe and Berkovsky, Shlomo and Coiera, Enrico
+               and Wilmott, James S and Liu, Sidong},
   booktitle = {2025 IEEE International Symposium on Biomedical Imaging (ISBI)},
   year      = {2025},
   url       = {https://ieeexplore.ieee.org/document/10981016/}
