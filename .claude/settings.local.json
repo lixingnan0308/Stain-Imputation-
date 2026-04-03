@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python3 -c \":*)",
-      "Bash(mv train_ddpm_mif_self_v2.py train_os2cr_diff.py)",
-      "Bash(mv sample_ddpm_self_v2.py sample_os2cr_diff.py)"
-    ]
-  }
-}
