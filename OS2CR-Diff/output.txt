@@ -1,0 +1,9 @@
+{
+    "0": "dapi",
+    "1": "cd68 (opal 520)",
+    "2": "cd8 (opal 570)",
+    "3": "cd16 (opal 620)",
+    "4": "pd-l1 (opal 650)",
+    "5": "sox10 (opal 690)",
+    "6": "autofluorescence"
+}
