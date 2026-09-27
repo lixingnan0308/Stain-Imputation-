@@ -255,7 +255,8 @@ class MultiMAE(nn.Module):
                 num_encoded_tokens
                 )
 
-        fixed_num_tokens = int(196*0.5)
+        # Retain 60% of base-stain tokens (40% masking), rounded to whole tokens.
+        fixed_num_tokens = int(num_tokens_per_task[0] * 0.60)
         k = 0
         for i, num_tokens in enumerate(num_tokens_per_task):
             # Use noise to shuffle arange

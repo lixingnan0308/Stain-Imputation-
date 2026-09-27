@@ -37,7 +37,7 @@ from AdSIMIMO.multimae1 import pretrain_multimae_base
 from AdSIMIMO.multimae_e import pretrain_multimae_base as pretrain_multimae_base_e
 
 class TrainerMMAE(Trainer):
-    def __init__(self, marker_panel, fixed_stain, results_dir, lr=0.002, seed=1):
+    def __init__(self, marker_panel, fixed_stain, results_dir, lr=1e-4, seed=42):
         """
         Trainer for the AdSI-MIMO MultiMAE-based stain imputation model.
 
@@ -47,8 +47,8 @@ class TrainerMMAE(Trainer):
             fixed_stain (list): Markers that are always available as input and are never
                                 imputed (e.g., ['dapi', 'autofluorescence']).
             results_dir (str): Directory where checkpoints and results are saved.
-            lr (float): Initial learning rate. Defaults to 0.002.
-            seed (int): Global random seed for reproducibility. Defaults to 1.
+            lr (float): Initial learning rate. Defaults to 1e-4.
+            seed (int): Global random seed for reproducibility. Defaults to 42.
         """
         super().__init__(marker_panel, fixed_stain, results_dir, lr)
         self.seed = seed
@@ -200,7 +200,7 @@ class TrainerMMAE(Trainer):
 
     def init_optimizer(self, model, filter_bias_and_bn=True, skip_list=None):
         """
-        Creates an AdamW optimizer for the model and loss-balancer parameters.
+        Creates an Adam optimizer for the model and loss-balancer parameters.
 
         When model is a dict with 'model' and 'balancer' keys, both parameter
         groups are added with lr_scale=1. When model is a plain nn.Module, all
@@ -214,9 +214,9 @@ class TrainerMMAE(Trainer):
             skip_list (list | None): Parameter names excluded from weight decay.
 
         Returns:
-            torch.optim.AdamW: Configured optimizer.
+            torch.optim.Adam: Configured optimizer.
         """
-        weight_decay = 1e-5
+        weight_decay = 0.0
 
         if isinstance(model, dict):
             # Optimise backbone and uncertainty-weighting balancer jointly
@@ -237,7 +237,7 @@ class TrainerMMAE(Trainer):
 
         opt_args = dict(lr=self.lr, weight_decay=weight_decay)
         print('Optimizer settings:', opt_args)
-        return optim.AdamW(parameters, **opt_args)
+        return optim.Adam(parameters, **opt_args)
 
     def init_loss_function(self, output_domains, DOMAIN_CONF):
         """
@@ -293,8 +293,8 @@ class TrainerMMAE(Trainer):
         """
         Returns the token-masking ratio for the current epoch using a step schedule.
 
-        The masking ratio starts at 30% and increases by 5% every 20 epochs,
-        capped at 80%. This curriculum encourages the model to first learn from
+        The masking ratio starts at 30% and increases by 5% every 25 epochs,
+        capped at 75% at epoch 225. This curriculum encourages the model to first learn from
         lightly masked inputs before facing the harder highly-masked setting.
 
         Args:
@@ -305,8 +305,8 @@ class TrainerMMAE(Trainer):
         """
         initial_pct = 30
         step_size = 5
-        epochs_per_step = 20
-        max_pct = 80
+        epochs_per_step = 25
+        max_pct = 75
         steps = current_epoch // epochs_per_step
         return min(initial_pct + steps * step_size, max_pct) * 0.01
 
@@ -513,7 +513,7 @@ if __name__ == '__main__':
         fixed_stain=fixed_stain,
         results_dir=results_dir,
         lr=0.0001,
-        seed=1,
+        seed=42,
     )
 
     obj.train(
@@ -522,8 +522,8 @@ if __name__ == '__main__':
         img_size=224,
         batch_size=16,
         num_workers=4,
-        max_epochs=400,
-        minimum_epochs=380,
-        patience=5,
+        max_epochs=250,
+        minimum_epochs=225,
+        patience=10,
         load_model_ckpt=False,
     )

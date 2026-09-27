@@ -174,14 +174,16 @@ Key parameters:
 | `percent` | `20` | % of training patches used per epoch |
 | `img_size` | `224` | Spatial resolution (pixels) |
 | `batch_size` | `16` | Batch size |
-| `max_epochs` | `400` | Maximum training epochs |
-| `patience` | `5` | Early-stopping patience (epochs) |
+| `max_epochs` | `250` | Maximum training epochs |
+| `minimum_epochs` | `225` | Earliest epoch index for early stopping, when APM reaches 75% |
+| `patience` | `10` | Early-stopping patience (validation checks) |
+| `seed` | `42` | Main experiment seed; repeat with 1 and 100 for variability |
 | `load_model_ckpt` | `False` | Resume from an existing checkpoint |
 | `checkpoint_name` | — | Checkpoint filename inside `results_dir` |
 
 Checkpoints (`checkpoint_{epoch}.pt`) bundle model weights, optimizer state, loss-balancer state, and epoch index. Training statistics (per-epoch loss, per-domain SSIM and Pearson-r) are written to `training_stats.csv`.
 
-**Training configuration used in the paper**: 250 epochs, lr = 1e-4, Adam, batch size 16, Tesla V100 GPU (~4 days).
+**Training configuration used in the paper**: up to 250 epochs, lr = 1e-4, Adam, batch size 16, seed 42, Tesla V100 GPU (~4 days). The implementation uses Adam's default zero weight decay; the paper does not specify weight decay.
 
 ---
 

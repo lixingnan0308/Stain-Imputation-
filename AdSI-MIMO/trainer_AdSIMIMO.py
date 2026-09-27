@@ -25,7 +25,7 @@ from dataloader_ssim import MxIFReader
 
 
 class Trainer:
-    def __init__(self, marker_panel, fixed_stain, results_dir, lr=0.002, seed=1):
+    def __init__(self, marker_panel, fixed_stain, results_dir, lr=1e-4, seed=42):
         """
         Base trainer for MxIF stain imputation models.
 
@@ -35,8 +35,8 @@ class Trainer:
             fixed_stain (list): Markers that are always available as input and never
                                 imputed (e.g., ['dapi', 'autofluorescence']).
             results_dir (str): Directory where checkpoints and result files are saved.
-            lr (float): Initial learning rate. Defaults to 0.002.
-            seed (int): Global random seed for reproducibility. Defaults to 1.
+            lr (float): Initial learning rate. Defaults to 1e-4.
+            seed (int): Global random seed for reproducibility. Defaults to 42.
         """
         self.marker_panel = marker_panel
         self.fixed_stain = fixed_stain
@@ -112,8 +112,8 @@ class Trainer:
 
         return [train_dataset, train_loader, valid_dataset, valid_loader]
 
-    def train(self, data_csv_path, percent=100, img_size=256, batch_size=64,
-              num_workers=4, max_epochs=200, minimum_epochs=50, patience=25,
+    def train(self, data_csv_path, percent=100, img_size=224, batch_size=16,
+              num_workers=4, max_epochs=250, minimum_epochs=225, patience=10,
               load_model_ckpt=False, checkpoint_name=None):
         """
         Full training pipeline: data loading, model/optimizer initialization,
@@ -122,12 +122,12 @@ class Trainer:
         Args:
             data_csv_path (str): Path to the CSV file with image paths and split labels.
             percent (int): Percentage of training data to use per epoch. Defaults to 100.
-            img_size (int): Spatial resolution for training patches. Defaults to 256.
-            batch_size (int): Batch size. Defaults to 64.
+            img_size (int): Spatial resolution for training patches. Defaults to 224.
+            batch_size (int): Batch size. Defaults to 16.
             num_workers (int): Worker processes for data loading. Defaults to 4.
-            max_epochs (int): Maximum number of training epochs. Defaults to 200.
-            minimum_epochs (int): Minimum epochs before early stopping is allowed. Defaults to 50.
-            patience (int): Epochs without improvement before stopping. Defaults to 25.
+            max_epochs (int): Maximum number of training epochs. Defaults to 250.
+            minimum_epochs (int): Minimum epochs before early stopping is allowed. Defaults to 225.
+            patience (int): Epochs without improvement before stopping. Defaults to 10.
             load_model_ckpt (bool): If True, resumes from an existing checkpoint. Defaults to False.
             checkpoint_name (str): Checkpoint filename to resume from (required if
                                    load_model_ckpt=True).
@@ -200,7 +200,7 @@ class Trainer:
                 self.counter += 1
                 print(f'No improvement for {self.counter} epoch(s).')
 
-            if self.counter > patience and epoch >= minimum_epochs:
+            if self.counter >= patience and epoch >= minimum_epochs:
                 print('Early stopping triggered.')
                 break
 
