@@ -81,30 +81,28 @@ Per-domain losses are automatically balanced by learnable **uncertainty weights*
 
 | Split | Melanoma | Urothelial |
 |-------|----------|------------|
-| Train | 60 % (n = 126) | 60 % (n = 25) |
-| Validation | 20 % (n = 43) | 20 % (n = 8) |
-| Internal test | 20 % (n = 42) | 20 % (n = 8) |
-| External test | separate cohort (n = 46) | separate cohort (n = 14) |
+| Train | 60 % (n = 126) | n = 23 |
+| Validation | 20 % (n = 43) | n = 8 |
+| Internal test | 20 % (n = 42) | n = 9 |
+| External test | separate cohort (n = 46) | separate cohort (n = 10) |
+
+Slide-level split assignments for the public urothelial carcinoma dataset ([Synapse syn51729692](https://www.synapse.org/Synapse:syn51729692/)) are provided in [`splits/uc_split_slide_level.csv`](splits/uc_split_slide_level.csv) (`slide_id`, `split`; slide IDs follow the Synapse folder names). Slides marked `not_used` were not included in any split.
 
 ---
 
 ## Requirements
 
-```
-Python >= 3.8
-torch >= 1.12
-torchvision
-einops
-pytorch_msssim
-numpy
-pandas
-scipy
-scikit-image
-tqdm
-```
+The training and inference environment is specified in [`environment.yml`](environment.yml) (Python 3.10, PyTorch 2.1.0 with CUDA 11.8):
 
 ```bash
-pip install torch torchvision einops pytorch_msssim numpy pandas scipy scikit-image tqdm
+conda env create -f environment.yml
+conda activate adsimimo-train
+```
+
+Automated reference segmentation uses a separate environment (Cellpose 3.1.1.3), see [`segmentation/requirements_segmentation.txt`](segmentation/requirements_segmentation.txt):
+
+```bash
+pip install -r segmentation/requirements_segmentation.txt
 ```
 
 ---
@@ -142,6 +140,12 @@ AdSI-MIMO/
 ├── trainer_AdSIMIMO.py     # Base Trainer: data setup, checkpointing, evaluation pipeline
 ├── evaluate_AdSIMIMO.py    # Standalone evaluation script
 ├── dataloader_ssim.py      # MxIFReader: dataset class and data loaders
+├── environment.yml         # Training / inference environment
+├── splits/
+│   └── uc_split_slide_level.csv   # Urothelial carcinoma slide-level split
+├── segmentation/
+│   ├── cellpose_segment.py        # Automated CD8 reference segmentation (Cellpose cyto)
+│   └── requirements_segmentation.txt
 └── AdSIMIMO/               # Model package (adapted from MultiMAE)
     ├── __init__.py
     ├── multimae1.py         # Training-time MultiMAE (Dirichlet + curriculum masking)
@@ -201,6 +205,28 @@ The `mask_biomarker` list in `evaluate_AdSIMIMO.py` controls which stains are tr
 For each imputed stain the script saves under `results_dir/{split}_{img_size}_{img_size}/`:
 - **`{stain}/{image_name}.npy`** — array of shape `(2, H, W)` containing `[real, generated]`
 - **`{stain}_stats.csv`** — per-image MAE, MSE, RMSE, PSNR, SSIM, Pearson-r, p-value
+
+---
+
+## Automated Reference Segmentation
+
+CD8⁺ cell detection and segmentation are evaluated against automated reference masks generated from the acquired CD8 images. `segmentation/cellpose_segment.py` segments the acquired and imputed CD8 images with identical settings:
+
+| Setting | Value |
+|---------|-------|
+| Model | Cellpose `cyto` (pretrained, no fine-tuning), Cellpose 3.1.1.3 |
+| Diameter | model default (30 px) |
+| Flow threshold | 0.45 |
+| Cell probability threshold | 0 |
+| Patches | 224 × 224; patches whose reference mask contains ≤ 1 cell are skipped |
+
+Each input `.npy` holds a `(2, H, W)` array: `[0]` acquired CD8 image, `[1]` imputed CD8 image.
+
+```bash
+python segmentation/cellpose_segment.py \
+    --npy-dir <imputed_patches_dir> --patch-list <patch_list.csv> \
+    --ref-mask-dir <reference_masks_dir> --out-mask-dir <imputed_masks_dir> --gpu
+```
 
 ---
 
