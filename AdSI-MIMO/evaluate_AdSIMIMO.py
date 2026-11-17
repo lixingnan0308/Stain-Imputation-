@@ -27,7 +27,7 @@ if __name__ == '__main__':
     fixed_stain = ['dapi', 'autofluorescence']
 
     # ---- Paths --------------------------------------------------------------
-    data_csv_path = './try_scale.csv'   # CSV with Image_Paths and Split_Name columns
+    data_csv_path = './data_split.csv'   # CSV with Image_Paths and Split_Name columns
     results_dir = './results_AdSIMIMO'  # Directory containing the saved checkpoint
 
     # ---- Build the trainer object -------------------------------------------

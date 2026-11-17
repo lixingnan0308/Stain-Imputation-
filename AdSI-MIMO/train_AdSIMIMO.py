@@ -504,7 +504,7 @@ if __name__ == '__main__':
     fixed_stain = ['dapi', 'autofluorescence']
 
     # ---- Paths --------------------------------------------------------------
-    data_csv_path = './try_scale.csv'
+    data_csv_path = './data_split.csv'
     results_dir = './results_AdSIMIMO'
 
     # ---- Build trainer and start training -----------------------------------

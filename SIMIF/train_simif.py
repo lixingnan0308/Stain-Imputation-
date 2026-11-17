@@ -387,7 +387,7 @@ if __name__ == '__main__':
     fixed_stain = ["dapi", "autofluorescence"]
     potential_output = ["cd8", "pd-l1"]
 
-    train_valid_test_data_csv_path = "try_scale.csv"
+    train_valid_test_data_csv_path = "data_split.csv"
     results_dir = "./results_SIMIF"
 
     obj = TrainerCGAN(marker_panel=stain_panel,
