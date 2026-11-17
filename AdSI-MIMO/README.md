@@ -81,10 +81,10 @@ Per-domain losses are automatically balanced by learnable **uncertainty weights*
 
 | Split | Melanoma | Urothelial |
 |-------|----------|------------|
-| Train | 60 % (n = 126) | n = 23 |
+| Train | 60 % (n = 126) | n = 25 |
 | Validation | 20 % (n = 43) | n = 8 |
-| Internal test | 20 % (n = 42) | n = 9 |
-| External test | separate cohort (n = 46) | separate cohort (n = 10) |
+| Internal test | 20 % (n = 42) | n = 8 |
+| External test | separate cohort (n = 46) | separate cohort (n = 14) |
 
 Slide-level split assignments for the public urothelial carcinoma dataset ([Synapse syn51729692](https://www.synapse.org/Synapse:syn51729692/)) are provided in [`splits/uc_split_slide_level.csv`](splits/uc_split_slide_level.csv) (`slide_id`, `split`; slide IDs follow the Synapse folder names). Slides marked `not_used` were not included in any split.
 
